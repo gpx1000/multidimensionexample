@@ -1,0 +1,194 @@
+apply plugin: 'com.android.model.library'
+
+model {
+    android {
+        defaultPublishConfig "oculusRelease"
+        publishNonDefault true
+
+        compileSdkVersion rootProject.ext.compileSdkVersion
+        buildToolsVersion rootProject.ext.buildToolsVersion
+
+        defaultConfig.with {
+            minSdkVersion.apiLevel = rootProject.ext.minSdkVersion
+            targetSdkVersion.apiLevel = rootProject.ext.targetSdkVersion
+            versionCode = rootProject.ext.versionCode
+            versionName = rootProject.ext.versionName
+        }
+
+        ndk {
+            moduleName "SauronNDK"
+            toolchain "clang"
+            stl rootProject.ext.stlVersion
+            CFlags.add("-fexceptions")
+            CFlags.add("-Wall")
+            CFlags.add("-Werror")
+            CFlags.add("-Wno-unused-function")
+            CFlags.add("-Wno-overloaded-virtual")
+            CFlags.add("-DVERSION=\"ver-${getRootProject().getVersion().toString()}\"".toString())
+            cppFlags.addAll(CFlags)
+            cppFlags.add("-frtti")
+            ldLibs.add("log")
+            ldLibs.add("z")
+            ldLibs.add("m")
+            ldLibs.add("GLESv3")
+            ldLibs.add("EGL")
+            ldLibs.add("android")
+            ldLibs.add("OpenSLES")
+            ldLibs.add("mediandk")
+            ldLibs.add("OpenMAXAL")
+            abiFilters.add("armeabi-v7a")
+        }
+
+        buildTypes {
+            release {
+                minifyEnabled false
+                ndk {
+                    CFlags.add("-O3")
+                    cppFlags.add("-O3")
+                    cppFlags.add("-mhard-float")
+                    cppFlags.add("-mfloat-abi=softfp")
+                    cppFlags.add("-mfpu=neon")
+                }
+            }
+            debug {
+                ndk {
+                    CFlags.add("-g")
+                    cppFlags.add("-g")
+                }
+            }
+        }
+
+        productFlavors {
+             create("cardboard") {
+                 dimension "platform"
+                 ndk {
+                     cppFlags.add("-DHMD_USE_CARDBOARD")
+                 }
+             }
+            create("oculus") {
+                dimension "platform"
+                ndk {
+                    cppFlags.add("-DHMD_USE_OCULUS")
+                }
+            }
+            create('dev') {
+                dimension "targetType"
+                ndk {
+                    CFlags.add("-DBASEURL=\"https://dev-gpxblog.com\"".toString())
+                    cppFlags.add("-DBASEURL=\"https://dev-gpxblog.com\"".toString())
+                }
+            }
+            create('stage') {
+                dimension "targetType"
+                ndk {
+                    CFlags.add("-DBASEURL=\"https://stage-gpxblog.com\"".toString())
+                    cppFlags.add("-DBASEURL=\"https://stage-gpxblog.com\"".toString())
+                }
+            }
+            create('live') {
+                dimension "targetType"
+                ndk {
+                    CFlags.add("-DBASEURL=\"https://gpxblog.com\"".toString())
+                    cppFlags.add("-DBASEURL=\"https://gpxblog.com\"".toString())
+                }
+            }
+        }
+    }
+
+    // This source set represents everything shared by all library variants
+    android.sources {
+        main {
+            jni {
+                source {
+                    exclude "**/External/*"
+                    exclude "**/OpenGL/*"
+                    exclude "**/NativeHmd/*"
+                    exclude "**/Oculus/*"
+                    exclude "**/Cardboard/*"
+
+                    srcDirs = ['cppFiles']
+                }
+            }
+        }
+        devOculus {
+            jni {
+                source {
+                    exclude "**/External/*"
+                    exclude "**/OpenGL/*"
+                    exclude "**/Cardboard/*"
+
+                    srcDirs = [
+                            "Oculus",
+                            "Android/NativeHmd"
+                    ]
+                }
+            }
+        }
+         devCardboard {
+             jni {
+                 source {
+                     exclude "**/External/*"
+                     exclude "**/OpenGL/*"
+                     exclude "**/NativeHmd/*"
+                     exclude "**/Oculus/*"
+
+                     srcDirs = ["Android/Cardboard"]
+                 }
+             }
+         }
+
+        stageOculus {
+            jni {
+                source {
+                    exclude "**/External/*"
+                    exclude "**/OpenGL/*"
+                    exclude "**/Cardboard/*"
+
+                    srcDirs = [
+                            "Oculus",
+                            "Android/NativeHmd"
+                    ]
+                }
+            }
+        }
+         stageCardboard {
+             jni {
+                 source {
+                     exclude "**/External/*"
+                     exclude "**/OpenGL/*"
+                     exclude "**/NativeHmd/*"
+                     exclude "**/Oculus/*"
+
+                     srcDirs = ["Android/Cardboard"]
+                 }
+             }
+         }
+
+        liveOculus {
+            jni {
+                source {
+                    exclude "**/External/*"
+                    exclude "**/OpenGL/*"
+                    exclude "**/Cardboard/*"
+
+                    srcDirs = [
+                            "Oculus",
+                            "Android/NativeHmd"
+                    ]
+                }
+            }
+        }
+         liveCardboard {
+             jni {
+                 source {
+                     exclude "**/External/*"
+                     exclude "**/OpenGL/*"
+                     exclude "**/NativeHmd/*"
+                     exclude "**/Oculus/*"
+
+                     srcDirs = ["Android/Cardboard"]
+                 }
+             }
+         }
+    }
+}

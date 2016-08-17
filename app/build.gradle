@@ -1,0 +1,93 @@
+apply plugin: 'com.android.application'
+
+configurations {
+    oculusDevDebugCompile
+    cardboardDevDebugCompile
+    oculusDevReleaseCompile
+    cardboardDevReleaseCompile
+
+    oculusStageDebugCompile
+    cardboardStageDebugCompile
+    oculusStageReleaseCompile
+    cardboardStageReleaseCompile
+
+    oculusLiveDebugCompile
+    cardboardLiveDebugCompile
+    oculusLiveReleaseCompile
+    cardboardLiveReleaseCompile
+}
+
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+
+    defaultConfig {
+        applicationId "com.gpxblog.multidimensionexample"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode rootProject.ext.versionCode
+        versionName rootProject.ext.versionName
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            debuggable true
+        }
+    }
+
+    flavorDimensions "platform", "targetType"
+
+    productFlavors {
+        live {
+            dimension "targetType"
+
+            ext.versionNameSuffix = ""
+        }
+        stage {
+            dimension "targetType"
+
+            ext.versionNameSuffix = "-STAGE"
+        }
+        dev {
+            dimension "targetType"
+
+            ext.versionNameSuffix = "-DEV"
+        }
+        cardboard {
+            dimension "platform"
+
+            applicationId "com.gpxblog.multidimensionexample.cardboard"
+
+            ext.versionNameSuffix = "-CARDBOARD"
+            ext.apiId = 'API_CARDBOARD'
+        }
+        oculus {
+            dimension "platform"
+
+            applicationId android.defaultConfig.applicationId
+
+            ext.versionNameSuffix = "-OCULUS"
+            ext.apiId = 'API_OCULUS'
+        }
+    }
+}
+
+dependencies {
+    oculusDevReleaseCompile project(path: ':foo', configuration: 'devOculusRelease')
+    oculusDevDebugCompile project(path: ':foo', configuration: 'devOculusDebug')
+    oculusStageReleaseCompile project(path: ':foo', configuration: 'stageOculusRelease')
+    oculusStageDebugCompile project(path: ':foo', configuration: 'stageOculusDebug')
+    oculusLiveReleaseCompile project(path: ':foo', configuration: 'liveOculusRelease')
+    oculusLiveDebugCompile project(path: ':foo', configuration: 'liveOculusDebug')
+
+    cardboardDevReleaseCompile project(path: ':foo', configuration: 'devCardboardRelease')
+    cardboardDevDebugCompile project(path: ':foo', configuration: 'devCardboardDebug')
+    cardboardStageReleaseCompile project(path: ':foo', configuration: 'stageCardboardRelease')
+    cardboardStageDebugCompile project(path: ':foo', configuration: 'stageCardboardDebug')
+    cardboardLiveReleaseCompile project(path: ':foo', configuration: 'liveCardboardRelease')
+    cardboardLiveDebugCompile project(path: ':foo', configuration: 'liveCardboardDebug')
+}

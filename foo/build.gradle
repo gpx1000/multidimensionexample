@@ -1,0 +1,249 @@
+apply plugin: 'com.android.model.library'
+
+model {
+    android.ndk {
+        moduleName "foo"
+        stl rootProject.ext.stlVersion
+        toolchain "clang"
+        CFlags.addAll(["-Wall", "-Werror", "-fexceptions"])
+        CFlags.addAll(["-Wno-unused-function", "-Wno-overloaded-virtual"])
+        cppFlags.addAll(CFlags)
+        ldLibs.addAll(["z", "c", "m", "dl", "log", "EGL", "GLESv3", "android"])
+        abiFilters.add("armeabi-v7a")
+        platformVersion rootProject.ext.platformVersion
+    }
+
+    android {
+        defaultPublishConfig "devOculusRelease"
+        publishNonDefault true
+
+        compileSdkVersion = rootProject.ext.compileSdkVersion
+        buildToolsVersion = rootProject.ext.buildToolsVersion
+
+        defaultConfig.with {
+            minSdkVersion.apiLevel = rootProject.ext.minSdkVersion
+            targetSdkVersion.apiLevel = rootProject.ext.targetSdkVersion
+            versionCode = rootProject.ext.versionCode
+            versionName = rootProject.ext.versionName
+        }
+
+        buildTypes {
+            release {
+                ndk {
+                    CFlags.addAll(["-O3", "-fno-tree-vectorize", "-D_NDK_MATH_NO_SOFTFP=1", "-mhard-float", "-mfloat-abi=softfp"])
+                    cppFlags.addAll(["-O3", "-fno-tree-vectorize", "-D_NDK_MATH_NO_SOFTFP=1", "-mhard-float", "-mfloat-abi=softfp"])
+                }
+            }
+            debug {
+                ndk {
+                    CFlags.add("-g")
+                    cppFlags.add("-g")
+                }
+            }
+        }
+
+    }
+
+    android.sources {
+        main {
+            jni {
+                source {
+                    exclude "**/jniTests/*"
+                    exclude "**/cardboard/*"
+                    exclude "**/nativehmd/*"
+                    srcDirs = ["src/main/jni"]
+                }
+            }
+        }
+
+        devOculusRelease {
+            jni {
+                source {
+                    exclude "**/jniTests/*"
+                    exclude "**/cardboard/*"
+
+                    srcDirs = ["src/main/jni/nativehmd"]
+                }
+                dependencies {
+                    project ":bar" buildType "release" productFlavor "devOculus" linkage "shared"
+                }
+            }
+        }
+
+        devOculusDebug {
+            jni {
+                source {
+                    exclude "**/jniTests/*"
+                    exclude "**/cardboard/*"
+
+                    srcDirs = ["src/main/jni/nativehmd"]
+                }
+                dependencies {
+                    project ":bar" buildType "debug" productFlavor "devOculus" linkage "shared"
+                }
+            }
+        }
+
+         devCardboardRelease {
+             jni {
+                 source {
+                     srcDirs = ["src/main/jni/cardboard"]
+                 }
+                 dependencies {
+                     project ":bar" buildType "release" productFlavor "devCardboard" linkage "shared"
+                 }
+             }
+         }
+
+         devCardboardDebug {
+             jni {
+                 source {
+                     srcDirs = ["src/main/jni/cardboard"]
+                 }
+                 dependencies {
+                     project ":bar" buildType "debug" productFlavor "devCardboard" linkage "shared"
+                 }
+             }
+         }
+
+        stageOculusRelease {
+            jni {
+                source {
+                    exclude "**/jniTests/*"
+                    exclude "**/cardboard/*"
+
+                    srcDirs = ["src/main/jni/nativehmd"]
+                }
+                dependencies {
+                    project ":bar" buildType "release" productFlavor "stageOculus" linkage "shared"
+                }
+            }
+        }
+
+        stageOculusDebug {
+            jni {
+                source {
+                    exclude "**/jniTests/*"
+                    exclude "**/cardboard/*"
+
+                    srcDirs = ["src/main/jni/nativehmd"]
+                }
+                dependencies {
+                    project ":bar" buildType "debug" productFlavor "stageOculus" linkage "shared"
+                }
+            }
+        }
+
+         stageCardboardRelease {
+             jni {
+                 source {
+                     srcDirs = ["src/main/jni/cardboard"]
+                 }
+                 dependencies {
+                     project ":bar" buildType "release" productFlavor "stageCardboard" linkage "shared"
+                 }
+             }
+         }
+
+         stageCardboardDebug {
+             jni {
+                 source {
+                     srcDirs = ["src/main/jni/cardboard"]
+                 }
+                 dependencies {
+                     project ":bar" buildType "debug" productFlavor "stageCardboard" linkage "shared"
+                 }
+             }
+         }
+
+        liveOculusRelease {
+            jni {
+                source {
+                    exclude "**/jniTests/*"
+                    exclude "**/cardboard/*"
+
+                    srcDirs = ["src/main/jni/nativehmd"]
+                }
+                dependencies {
+                    project ":bar" buildType "release" productFlavor "liveOculus" linkage "shared"
+                }
+            }
+        }
+
+        liveOculusDebug {
+            jni {
+                source {
+                    exclude "**/jniTests/*"
+                    exclude "**/cardboard/*"
+
+                    srcDirs = ["src/main/jni/nativehmd"]
+                }
+                dependencies {
+                    project ":bar" buildType "debug" productFlavor "liveOculus" linkage "shared"
+                }
+            }
+        }
+
+         liveCardboardRelease {
+             jni {
+                 source {
+                     srcDirs = ["src/main/jni/cardboard"]
+                 }
+                 dependencies {
+                     project ":bar" buildType "release" productFlavor "liveCardboard" linkage "shared"
+                 }
+             }
+         }
+
+         liveCardboardDebug {
+             jni {
+                 source {
+                     srcDirs = ["src/main/jni/cardboard"]
+                 }
+                 dependencies {
+                     project ":bar" buildType "debug" productFlavor "liveCardboard" linkage "shared"
+                 }
+             }
+         }
+
+    }
+
+    android.productFlavors {
+         create('cardboard') {
+             dimension "platform"
+
+             ndk {
+                 cppFlags.add("-DHMD_USE_CARDBOARD")
+             }
+         }
+        create('oculus') {
+            dimension "platform"
+
+            ndk {
+                cppFlags.add("-DHMD_USE_OCULUS")
+            }
+        }
+        create('dev') {
+            dimension "targetType"
+            ndk {
+                CFlags.add("-DBASEURL=\"https://dev-gpxblog.com\"".toString())
+                cppFlags.add("-DBASEURL=\"https://dev-gpxblog.com\"".toString())
+            }
+        }
+        create('stage') {
+            dimension "targetType"
+            ndk {
+                CFlags.add("-DBASEURL=\"https://stage-gpxblog.com\"".toString())
+                cppFlags.add("-DBASEURL=\"https://stage-gpxblog.com\"".toString())
+            }
+        }
+        create('live') {
+            dimension "targetType"
+            ndk {
+                CFlags.add("-DBASEURL=\"https://gpxblog.com\"".toString())
+                cppFlags.add("-DBASEURL=\"https://gpxblog.com\"".toString())
+            }
+        }
+    }
+
+}
